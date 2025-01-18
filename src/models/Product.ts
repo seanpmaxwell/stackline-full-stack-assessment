@@ -1,5 +1,4 @@
 
-
 // **** Types **** //
 
 export interface IProduct {
@@ -37,4 +36,31 @@ interface ISalesDataItem {
   unitsSold: number;
   retailerMargin: number;
   id?: number; // Required for datagrid component
+}
+
+
+// **** Functions **** //
+
+/**
+ * Placeholder for uninitialized data
+ */
+export function getBlankProduct(): IProduct {
+  return {
+    id: '',
+    title: '',
+    image: '',
+    subtitle: '',
+    brand: '',
+    retailer: '',
+    details: [],
+    tags: [],
+    sales: {
+      meta: {
+        totalCount: 0,
+        pageSize: 0,
+        offset: 0,
+      },
+      data: [],
+    },
+  };
 }

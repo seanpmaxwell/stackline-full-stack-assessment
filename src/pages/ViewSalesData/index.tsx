@@ -11,7 +11,7 @@ import ProductOverview from './ProductOverview';
 import SalesLineGraph from './SalesLineGraph';
 import ProductSalesTable from './ProductSalesTable';
 
-import { IState, actions, fetchProduct } from './index.slice';
+import { IViewSalesDataState, actions, fetchProduct } from './index.slice';
 import { AppDispatch } from '../../App';
 
 
@@ -23,7 +23,8 @@ import { AppDispatch } from '../../App';
 function ViewSalesData() {
   const dispatch = useDispatch<AppDispatch>(),
     location = useLocation(),
-    state = useSelector<IState, IState>(sliceState => sliceState);
+    state = useSelector<IViewSalesDataState, IViewSalesDataState>(state => 
+      state);
 
   // Set the product id
   useEffect(() => {
@@ -34,11 +35,20 @@ function ViewSalesData() {
 
   // Fetch the productId
   useEffect(() => {
-    dispatch(fetchProduct({
-      productId: state.productId,
-      filter: state.filter,
-    }));
+    if (!!state.productId) {
+      dispatch(fetchProduct({
+        productId: state.productId,
+        filter: state.filter,
+      }));
+    }
   }, [dispatch, state.filter, state.productId]);
+
+  // Display any error messages
+  useEffect(() => {
+    if (state.fetchProductStatus.isError) {
+      alert(state.fetchProductStatus.error);
+    }
+  }, [state.fetchProductStatus.error, state.fetchProductStatus.isError]);
   
   // Return
   return (

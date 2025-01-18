@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import { IViewSalesDataState } from './index.slice';
 
 
 // **** Components **** //
@@ -7,6 +8,8 @@ import Box from '@mui/material/Box';
  * Display line chart for sales data.
  */
 function SalesLineGraph() {
+
+
   return (
     <Box>
       Retail Sales

@@ -1,30 +1,60 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { IProduct } from '../../models/Product';
+import { getBlankProduct, IProduct } from '../../models/Product';
 import fetchProductMock from '../../__test__/fetchProductMock';
+
+
+// **** Variables **** //
+
+const cache = new Map<string, IProduct>();
 
 
 // **** Types **** //
 
-export interface IState {
+export interface IViewSalesDataState {
   productId: string;
-  data: IProduct | null;
+  data: IProduct;
   filter: string;
   fetchProductStatus: {
     isLoading: boolean;
     isError: boolean;
+    error: unknown;
   };
+}
+
+interface IFetchProductParams {
+  productId: string;
+  filter: string;
 }
 
 
 // **** Setup **** //
 
-// Fetch Proudct API call
+/**
+ * NOTE: In real-world app we would use "createApi" so we can cache our data,
+ * but I'm just using createAsyncThunk since we're calling a mock API.
+ */
 export const fetchProduct = createAsyncThunk(
-  'fetchTodos',
-  async (params: { productId: string, filter: string }) => {
-    const resp = await fetchProductMock(params.productId, params.filter);
-    return resp;
+  'fetchProduct',
+  async (params: IFetchProductParams, { rejectWithValue }) => {
+    try {
+      const { productId, filter } = params,
+        key = `/api/product/${productId}?${filter}`,
+        cacheData = cache.get(key);
+      let resp;
+      if (!!cacheData) {
+        return cacheData;
+      } else {
+        resp = await fetchProductMock(productId, filter);
+        cache.set(key, resp);
+      }
+      return resp;
+    } catch (err: any) {
+      if (!err.response) {
+        throw err;
+      }
+      return rejectWithValue(err.response.data);
+    }
   },
 );
 
@@ -33,13 +63,14 @@ const slice = createSlice({
   name: 'redux',
   initialState: {
     productId: '',
-    data: null,
+    data: getBlankProduct(),
     filter: '',
     fetchProductStatus: {
       isLoading: false,
       isError: false,
+      error: null,
     },
-  } as IState,
+  } as IViewSalesDataState,
   reducers: {
     setProductId: (state, action) => {
       state.productId = action.payload;
@@ -56,8 +87,10 @@ const slice = createSlice({
       state.fetchProductStatus.isLoading = false;
       state.data = action.payload;
     });
-    builder.addCase(fetchProduct.rejected, state => {
+    builder.addCase(fetchProduct.rejected, (state, action) => {
+      state.fetchProductStatus.isLoading = false;
       state.fetchProductStatus.isError = true;
+      state.fetchProductStatus.error = action.error.message;
     });
   },
 });

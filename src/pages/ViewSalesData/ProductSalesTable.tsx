@@ -4,7 +4,7 @@ import { DataGrid, GridSortModel } from '@mui/x-data-grid';
 
 import Box from '@mui/material/Box';
 
-import { actions, IState } from './index.slice';
+import { actions, IViewSalesDataState } from './index.slice';
 import { AppDispatch } from '../../App';
 
 
@@ -15,7 +15,8 @@ import { AppDispatch } from '../../App';
  */
 function ProductSalesTable() {
   const dispatch = useDispatch<AppDispatch>(),
-    state = useSelector<IState, IState>(sliceState => sliceState);
+    state = useSelector<IViewSalesDataState, IViewSalesDataState>(state => 
+      state);
 
   // Set pagination
   const [ pagination, setPagination ] = useState({
