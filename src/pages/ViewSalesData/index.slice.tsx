@@ -20,6 +20,12 @@ export interface IViewSalesDataState {
     isError: boolean;
     error: unknown;
   };
+  salesDataFull: IProduct['sales'];
+  fetchAllSalesDataStatus: {
+    isLoading: boolean;
+    isError: boolean;
+    error: unknown;
+  };
 }
 
 interface IFetchProductParams {
@@ -58,6 +64,25 @@ export const fetchProduct = createAsyncThunk(
   },
 );
 
+/**
+ * For the line graph
+ */
+export const fetchAllSalesData = createAsyncThunk(
+  'fetchAllSalesData',
+  async (params: { productId: string }, { rejectWithValue }) => {
+    try {
+      const { productId } = params,
+        resp = await fetchProductMock(productId, '');
+      return resp.sales;
+    } catch (err: any) {
+      if (!err.response) {
+        throw err;
+      }
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
 // Setup slice
 const slice = createSlice({
   name: 'redux',
@@ -66,6 +91,19 @@ const slice = createSlice({
     data: getBlankProduct(),
     filter: '',
     fetchProductStatus: {
+      isLoading: false,
+      isError: false,
+      error: null,
+    },
+    salesDataFull: {
+      meta: {
+        totalCount: 0,
+        pageSize: 0,
+        offset: 0,
+      },
+      data: [],
+    },
+    fetchAllSalesDataStatus: {
       isLoading: false,
       isError: false,
       error: null,
@@ -91,6 +129,18 @@ const slice = createSlice({
       state.fetchProductStatus.isLoading = false;
       state.fetchProductStatus.isError = true;
       state.fetchProductStatus.error = action.error.message;
+    });
+    builder.addCase(fetchAllSalesData.pending, state => {
+      state.fetchAllSalesDataStatus.isLoading = true;
+    });
+    builder.addCase(fetchAllSalesData.fulfilled, (state, action) => {
+      state.fetchAllSalesDataStatus.isLoading = false;
+      state.salesDataFull = action.payload;
+    });
+    builder.addCase(fetchAllSalesData.rejected, (state, action) => {
+      state.fetchAllSalesDataStatus.isLoading = false;
+      state.fetchAllSalesDataStatus.isError = true;
+      state.fetchAllSalesDataStatus.error = action.error.message;
     });
   },
 });

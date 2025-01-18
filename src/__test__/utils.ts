@@ -25,8 +25,8 @@ export function applyFilterToDummyData<T extends TDataItem[]>(
   // Parse filter string
   const filter = Object.fromEntries(new URLSearchParams(filterStr)),
     { sortBy, sortDir } = filter,
-    offset = Number(filter.offset),
-    limit = Number(filter.limit);
+    offset = Number(filter.offset || 0),
+    limit = Number(filter.limit || data.length);
   let filteredData = [ ...data ];
   // Sort the array
   if (!!sortBy) {
@@ -46,7 +46,7 @@ export function applyFilterToDummyData<T extends TDataItem[]>(
     meta: {
       totalCount: data.length,
       pageSize: Number(filter.pageSize),
-      offset: Number(filter.pageSize),
+      offset: Number(filter.offset),
     },
     data: filteredData.slice(offset, offset + limit) as T,
   };
