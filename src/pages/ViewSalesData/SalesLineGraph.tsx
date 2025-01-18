@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 function SalesLineGraph() {
   return (
     <Box>
-      Graph
+      Retail Sales
     </Box>
   );
 }

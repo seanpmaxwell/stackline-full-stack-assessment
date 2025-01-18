@@ -1,10 +1,18 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
 import ProductOverview from './ProductOverview';
 import SalesLineGraph from './SalesLineGraph';
 import ProductSalesTable from './ProductSalesTable';
+
+import { IState, actions, fetchProduct } from './index.slice';
+import { AppDispatch } from '../../App';
 
 
 // **** Components **** //
@@ -13,8 +21,29 @@ import ProductSalesTable from './ProductSalesTable';
  * View sales data for a company.
  */
 function ViewSalesData() {
+  const dispatch = useDispatch<AppDispatch>(),
+    location = useLocation(),
+    state = useSelector<IState, IState>(sliceState => sliceState);
+
+  // Set the product id
+  useEffect(() => {
+    const arr = location.pathname.split('/'),
+      id = arr[arr.length - 1];
+    dispatch(actions.setProductId(id));
+  }, [dispatch, location.pathname]);
+
+  // Fetch the productId
+  useEffect(() => {
+    dispatch(fetchProduct({
+      productId: state.productId,
+      filter: state.filter,
+    }));
+  }, [dispatch, state.filter, state.productId]);
+  
+  // Return
   return (
-    <Box p={2}>
+    <Container maxWidth="xl">
+      <Box my={8}/>
       <Grid 
         container={true}
         direction="row"
@@ -22,12 +51,11 @@ function ViewSalesData() {
         sx={{
           justifyContent: 'flex-start',
           alignItems: 'stretch',
-          pt: 4,
         }}
       >
         {/* Product Overview (Left Side) */}
         <Grid item={true} xs={3}>
-          <Paper elevation={3}>
+          <Paper elevation={3} sx={{ p: 2 }}>
             <ProductOverview/>
           </Paper>
         </Grid>
@@ -44,21 +72,21 @@ function ViewSalesData() {
           }}
         >
           {/* Line Graph */}
-          <Grid>
-            <Paper elevation={3}>
+          <Grid sx={{ mb: 2 }}>
+            <Paper elevation={3} sx={{ p: 2 }}>
               <SalesLineGraph/>
             </Paper>
           </Grid>
           {/* Sales Table */}
           <Grid>
-            <Paper elevation={3}>
+            <Paper elevation={3} sx={{ p: 2 }}>
               <ProductSalesTable/>
             </Paper>
           </Grid>
         </Grid>
       </Grid>
-    </Box>
-  )
+    </Container>
+  );
 }
 
 

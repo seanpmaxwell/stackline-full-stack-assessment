@@ -1,6 +1,9 @@
-import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Container from '@mui/material/Container';
+import Toolbar from '@mui/material/Toolbar';
 
 import logo from '../assets/stackline_logo.svg';
+import Colors from '../styles/Colors';
 
 
 // **** Components **** //
@@ -10,19 +13,22 @@ import logo from '../assets/stackline_logo.svg';
  */
 function Header() {
   return (
-    <Box style={{
-      backgroundColor: '#000000',
+    <AppBar sx={{
+      position: 'static',
+      backgroundColor: Colors.headerBkg,
     }}>
-      <img
-        alt="logo"
-        src={logo}
-        style={{
-          height: 20,
-          width: 20,
-        }}
-      />
-      ass
-    </Box>
+      <Container maxWidth="xl">
+        <Toolbar disableGutters={true}>
+          <img
+            alt="logo"
+            src={logo}
+            style={{
+              height: 25,
+            }}
+          />
+        </Toolbar>
+      </Container>
+    </AppBar>
   )
 }
 

@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
  * View primary information (i.e. Name/Description) for a product.
  */
 function ProductOverview() {
+  
   return (
     <Box>
       Overview
