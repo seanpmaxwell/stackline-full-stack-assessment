@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -15,6 +15,15 @@ import { IViewSalesDataState, actions, fetchProduct } from './index.slice';
 import { AppDispatch } from '../../App';
 
 
+// **** Types **** //
+
+interface IViewSalesDataLocalState {
+  productId: string;
+  filter: string;
+  fetchProductStatus: IViewSalesDataState['fetchProductStatus'];
+}
+
+
 // **** Components **** //
 
 /**
@@ -22,9 +31,18 @@ import { AppDispatch } from '../../App';
  */
 function ViewSalesData() {
   const dispatch = useDispatch<AppDispatch>(),
-    location = useLocation(),
-    state = useSelector<IViewSalesDataState, IViewSalesDataState>(state => 
-      state);
+    location = useLocation();
+
+  // Initialize state
+  const {
+    productId,
+    filter,
+    fetchProductStatus,
+  } = useSelector<IViewSalesDataState, IViewSalesDataLocalState>(state => ({
+    productId: state.productId,
+    filter: state.filter,
+    fetchProductStatus: state.fetchProductStatus,
+  }), shallowEqual);
 
   // Set the product id
   useEffect(() => {
@@ -35,20 +53,20 @@ function ViewSalesData() {
 
   // Fetch the productId
   useEffect(() => {
-    if (!!state.productId) {
+    if (!!productId) {
       dispatch(fetchProduct({
-        productId: state.productId,
-        filter: state.filter,
+        productId: productId,
+        filter: filter,
       }));
     }
-  }, [dispatch, state.filter, state.productId]);
+  }, [dispatch, filter, productId]);
 
   // Display any error messages
   useEffect(() => {
-    if (state.fetchProductStatus.isError) {
-      alert(state.fetchProductStatus.error);
+    if (fetchProductStatus.isError) {
+      alert(fetchProductStatus.error);
     }
-  }, [state.fetchProductStatus.error, state.fetchProductStatus.isError]);
+  }, [fetchProductStatus.error, fetchProductStatus.isError]);
   
   // Return
   return (
@@ -65,7 +83,7 @@ function ViewSalesData() {
       >
         {/* Product Overview (Left Side) */}
         <Grid item={true} xs={3}>
-          <Paper elevation={3} sx={{ p: 2 }}>
+          <Paper elevation={3} sx={{ height: '100%' }}>
             <ProductOverview/>
           </Paper>
         </Grid>

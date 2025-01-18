@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import { IViewSalesDataState } from './index.slice';
 
 
 // **** Components **** //

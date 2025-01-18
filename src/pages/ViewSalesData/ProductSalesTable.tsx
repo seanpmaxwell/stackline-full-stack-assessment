@@ -1,11 +1,20 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { DataGrid, GridSortModel } from '@mui/x-data-grid';
 
 import Box from '@mui/material/Box';
 
 import { actions, IViewSalesDataState } from './index.slice';
 import { AppDispatch } from '../../App';
+import { IProduct } from '../../models/Product';
+
+
+// **** Types **** //
+
+interface IProductSalesTableState {
+  product: IProduct;
+  fetchProductStatus: IViewSalesDataState['fetchProductStatus'];
+}
 
 
 // **** Components **** //
@@ -14,9 +23,16 @@ import { AppDispatch } from '../../App';
  * Table component for sales data.
  */
 function ProductSalesTable() {
-  const dispatch = useDispatch<AppDispatch>(),
-    state = useSelector<IViewSalesDataState, IViewSalesDataState>(state => 
-      state);
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Initialize state
+  const {
+    product,
+    fetchProductStatus,
+  } = useSelector<IViewSalesDataState, IProductSalesTableState>(state => ({
+    product: state.data,
+    fetchProductStatus: state.fetchProductStatus,
+  }), shallowEqual);
 
   // Set pagination
   const [ pagination, setPagination ] = useState({
@@ -32,10 +48,10 @@ function ProductSalesTable() {
 
   // The Data Grid component requires all rows to have a unique `id` property.
   const rows = useMemo(() => {
-    return state.data?.sales.data.map((row, idx) => {
+    return product.sales.data.map((row, idx) => {
       return Object.assign({ id: idx }, row);
     });
-  }, [state.data]);
+  }, [product]);
 
   // Update the filter if sorting or pagination changes. NOTE this should
   // trigger another API call in the parent component.
@@ -58,7 +74,7 @@ function ProductSalesTable() {
     }}>
       <DataGrid
         rows={rows ?? []}
-        loading={state.fetchProductStatus.isLoading}
+        loading={fetchProductStatus.isLoading}
         columns={[
           {
             field: 'weekEnding',
@@ -96,7 +112,7 @@ function ProductSalesTable() {
         }}
         sortingMode="server"
         paginationMode="server"
-        rowCount={state.data?.sales.meta.totalCount ?? 0}
+        rowCount={product.sales.meta.totalCount ?? 0}
         onPaginationModelChange={val => setPagination(val)}
         onSortModelChange={val => setSorting(val)}
         pageSizeOptions={[5, 10]}
