@@ -23,16 +23,24 @@ export function applyFilterToDummyData<T extends TDataItem[]>(
   filterStr: string,
 ): IFilteredData<T> {
   // Parse filter string
-  const filter = Object.fromEntries(new URLSearchParams(filterStr));
-  // Filter the data
-
-  // pick up here
-  console.log(filterStr)
-
-    // pick up here
-  const filteredData = data
-
-
+  const filter = Object.fromEntries(new URLSearchParams(filterStr)),
+    { sortBy, sortDir } = filter,
+    offset = Number(filter.offset),
+    limit = Number(filter.limit);
+  let filteredData = [ ...data ];
+  // Sort the array
+  if (!!sortBy) {
+    const col = sortBy,
+      dir = sortDir ?? 'asc';
+    filteredData = data.sort((a, b) => {
+      let aVal = a[col], bVal = b[col];
+      if (dir === 'desc') {
+        aVal = b[col];
+        bVal = a[col];
+      }
+      return String(aVal).localeCompare(String(bVal));
+    });
+  }
   // Return
   return {
     meta: {
@@ -40,6 +48,6 @@ export function applyFilterToDummyData<T extends TDataItem[]>(
       pageSize: Number(filter.pageSize),
       offset: Number(filter.pageSize),
     },
-    data: filteredData,
+    data: filteredData.slice(offset, offset + limit) as T,
   };
 }

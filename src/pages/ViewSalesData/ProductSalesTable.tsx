@@ -15,12 +15,11 @@ import { AppDispatch } from '../../App';
  */
 function ProductSalesTable() {
   const dispatch = useDispatch<AppDispatch>(),
-    state = useSelector<IState, IState>(sliceState => sliceState),
-    [ filter, setFilter ] = useState('');
+    state = useSelector<IState, IState>(sliceState => sliceState);
 
   // Set pagination
   const [ pagination, setPagination ] = useState({
-    pageSize: 5,
+    pageSize: 10,
     page: 0,
   });
 
